@@ -29,7 +29,30 @@ class MonteCarloRunner(object):
                     fig.delaxes(axes.flatten()[i])
             plt.show()
 
-        return result
+        return sum(result) / num_runs
+
+    @staticmethod
+    def plot_runs(var: str, num_runs:int, params: dict, seed: int, bounds: list):
+        """Plot the percolation percentage against a param with a specified bound"""
+        xs = np.linspace(float(bounds[0]), float(bounds[1]), num=100)
+        ys = []
+
+        for x in xs:
+            y = MonteCarloRunner.run(
+                    num_runs=num_runs,
+                    seed=seed,
+                    draw=False,
+                    params = {
+                        **params,
+                        var : x
+                    }
+                )
+            ys.append(y)
+
+        _, ax = plt.subplots()
+        ax.scatter(xs, ys)
+
+        plt.show()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run a percolation monte carlo")
@@ -39,18 +62,33 @@ def parse_args():
     parser.add_argument("-s", "--seed", type=int)
     parser.add_argument("-d", "--draw", action="store_true")
     parser.add_argument("-v", "--vacancy-percentage", type=float)
+    parser.add_argument("--plot-runs", action="store_true")
+    parser.add_argument("--variable", type=str)
+    parser.add_argument("--bounds", type=str)
 
     return parser.parse_args()
     
 def main():
     args = parse_args()
+    
+    params = {
+        "length": args.length,
+        "height": args.height,
+        "vacancy_percentage": args.vacancy_percentage,
+    }
+    if args.plot_runs:
+        MonteCarloRunner.plot_runs(
+            var=args.variable,
+            num_runs=args.num_runs,
+            params=params,
+            seed=args.seed,
+            bounds=args.bounds.split(","),
+        )
+        return
+
     MonteCarloRunner.run(
         num_runs=args.num_runs,
         seed=args.seed,
         draw=args.draw,
-        params = {
-            "length": args.length,
-            "height": args.height,
-            "vacancy_percentage": args.vacancy_percentage,
-        }
+        params=params,
     )

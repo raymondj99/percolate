@@ -8,9 +8,9 @@ from .utils.union_find import UnionFind
 class PercolationGrid:
     """An abstract representation of a physical percolation model"""
     def __init__(self, length:int, height:int, vacancy_percentage: float):
-        self.length = length
-        self.height = height
-        self.grid = [random.random() >= vacancy_percentage for _ in range(length * height)]
+        self.length = int(length)
+        self.height = int(height)
+        self.grid = [random.random() >= vacancy_percentage for _ in range(self.length * self.height)]
         self.uf = self._construct_trees()
 
     def _construct_trees(self) -> UnionFind:
